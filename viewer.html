@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leitor de PDF | Túlyo Neves</title>
+  <link rel="icon" type="image/png" href="assets/logo-tn.png" />
+  <link rel="shortcut icon" type="image/png" href="assets/logo-tn.png" />
+  <link rel="apple-touch-icon" href="assets/logo-tn.png" />
+  <meta name="theme-color" content="#006dff" />
+  <meta property="og:title" content="Túlyo Neves | Materiais Medicina" />
+  <meta property="og:description" content="Leitor interno de materiais acadêmicos de Medicina." />
+  <meta property="og:image" content="assets/logo-tn.png" />
+  <meta property="og:type" content="website" />
+  <style>
+    :root {
+      --azul-profundo: #020b2f;
+      --azul-navy: #061d5f;
+      --azul-vivo: #006dff;
+      --ciano: #00d5c8;
+      --branco: #ffffff;
+      --off-white: #f7fbff;
+      --cinza-texto: #334155;
+      --sombra-azul: 0 24px 70px rgba(0, 43, 138, 0.18);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--azul-profundo);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(0, 109, 255, 0.18), transparent 32rem),
+        radial-gradient(circle at 90% 2%, rgba(0, 213, 200, 0.20), transparent 30rem),
+        linear-gradient(180deg, #f8fcff 0%, #eef8ff 52%, #ffffff 100%);
+      overflow-x: hidden;
+    }
+
+    a,
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(0, 109, 255, 0.28);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(1320px, calc(100% - 24px));
+      margin: 0 auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(0, 109, 255, 0.12);
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(22px);
+    }
+
+    .navbar-inner {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-weight: 950;
+      color: var(--azul-navy);
+    }
+
+    .brand img {
+      width: 92px;
+      height: auto;
+      filter: drop-shadow(0 8px 16px rgba(0, 40, 130, 0.12));
+    }
+
+    .viewer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 17px;
+      border: 1px solid rgba(0, 109, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--azul-navy);
+      font-weight: 950;
+      cursor: pointer;
+      transition: 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 43, 138, 0.10);
+    }
+
+    .btn-primary {
+      color: var(--branco);
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--azul-vivo), var(--ciano));
+      box-shadow: 0 16px 34px rgba(0, 109, 255, 0.22);
+    }
+
+    .hero {
+      padding: 34px 0 18px;
+    }
+
+    .kicker {
+      width: fit-content;
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 9px 14px;
+      border: 1px solid rgba(0, 213, 200, 0.26);
+      border-radius: 999px;
+      color: var(--azul-navy);
+      background: rgba(255, 255, 255, 0.76);
+      font-size: 0.78rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 980px;
+      color: var(--azul-profundo);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.04;
+      letter-spacing: -0.045em;
+    }
+
+    .viewer-panel {
+      position: relative;
+      margin: 18px auto 36px;
+      padding: 14px;
+      border: 1px solid rgba(0, 109, 255, 0.14);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: var(--sombra-azul);
+      overflow: hidden;
+    }
+
+    .viewer-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 4px 14px;
+    }
+
+    .viewer-status {
+      color: var(--cinza-texto);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .pdf-frame {
+      width: 100%;
+      height: min(78vh, 920px);
+      min-height: 620px;
+      border: 1px solid rgba(0, 109, 255, 0.13);
+      border-radius: 18px;
+      background: var(--off-white);
+      overflow: hidden;
+    }
+
+    .pdf-frame iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      background: var(--off-white);
+    }
+
+    .fallback {
+      display: none;
+      padding: 32px;
+      border: 1px dashed rgba(0, 109, 255, 0.28);
+      border-radius: 18px;
+      color: var(--cinza-texto);
+      background: rgba(247, 251, 255, 0.82);
+      line-height: 1.7;
+    }
+
+    .fallback strong {
+      color: var(--azul-profundo);
+    }
+
+    footer {
+      padding: 24px 0 38px;
+      color: var(--cinza-texto);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      .navbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 8px 0 12px;
+      }
+
+      .brand img {
+        width: 76px;
+      }
+
+      .viewer-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .hero {
+        padding-top: 24px;
+      }
+
+      .kicker {
+        max-width: 100%;
+        flex-wrap: wrap;
+        border-radius: 22px;
+      }
+
+      h1 {
+        font-size: clamp(1.8rem, 9vw, 3rem);
+        line-height: 1.08;
+      }
+
+      .viewer-panel {
+        padding: 10px;
+        border-radius: 22px;
+      }
+
+      .pdf-frame {
+        height: 72vh;
+        min-height: 520px;
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="shell navbar-inner">
+      <a class="brand" href="index.html#resumos" id="brandHome" aria-label="Voltar para os materiais">
+        <img src="assets/logo-tn.png" alt="Túlyo Neves Materiais Medicina" />
+      </a>
+
+      <div class="viewer-actions">
+        <button class="btn" type="button" id="backButton">Voltar aos materiais</button>
+        <a class="btn btn-primary" id="downloadButton" href="#" download>Baixar PDF</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell">
+        <div class="kicker">
+          <span>Medicina</span>
+          <span>•</span>
+          <span>Leitor interno</span>
+          <span>•</span>
+          <span>PDF</span>
+        </div>
+        <h1 id="viewerTitle">Material de Medicina</h1>
+      </div>
+    </section>
+
+    <section class="viewer-panel shell">
+      <div class="viewer-toolbar">
+        <p class="viewer-status" id="viewerStatus">Carregando o material no leitor interno.</p>
+        <a class="btn" id="openExternalButton" href="#" target="_blank" rel="noopener">Abrir em nova aba</a>
+      </div>
+
+      <div class="pdf-frame" id="pdfFrameWrap">
+        <iframe id="pdfFrame" title="PDF incorporado"></iframe>
+      </div>
+
+      <div class="fallback" id="fallbackMessage">
+        <strong>Não foi possível carregar o PDF aqui.</strong><br />
+        Use o botão de baixar ou abrir em nova aba para acessar o material.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      Os materiais disponibilizados têm finalidade exclusivamente acadêmica e complementar. Eles não substituem livros-texto, aulas, diretrizes oficiais ou orientação docente.
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get('file') || '';
+    const title = params.get('title') || 'Material de Medicina';
+    const viewerTitle = document.querySelector('#viewerTitle');
+    const viewerStatus = document.querySelector('#viewerStatus');
+    const pdfFrame = document.querySelector('#pdfFrame');
+    const pdfFrameWrap = document.querySelector('#pdfFrameWrap');
+    const fallbackMessage = document.querySelector('#fallbackMessage');
+    const downloadButton = document.querySelector('#downloadButton');
+    const openExternalButton = document.querySelector('#openExternalButton');
+    const backButton = document.querySelector('#backButton');
+    const brandHome = document.querySelector('#brandHome');
+
+    function safeFilePath(value) {
+      const trimmed = value.trim();
+      if (!trimmed || /^https?:\/\//i.test(trimmed) || trimmed.startsWith('/') || trimmed.includes('..')) {
+        return '';
+      }
+      return trimmed;
+    }
+
+    function showFallback(message) {
+      viewerStatus.textContent = message;
+      pdfFrameWrap.style.display = 'none';
+      fallbackMessage.style.display = 'block';
+    }
+
+    const safeFile = safeFilePath(file);
+    viewerTitle.textContent = title;
+    document.title = `${title} | Túlyo Neves`;
+
+    if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+      brandHome.href = document.referrer;
+    }
+
+    backButton.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = brandHome.href;
+      }
+    });
+
+    if (safeFile) {
+      downloadButton.href = safeFile;
+      openExternalButton.href = safeFile;
+      viewerStatus.textContent = 'PDF incorporado ao site. Você também pode baixar o arquivo para estudar offline.';
+      window.addEventListener('load', () => {
+        window.setTimeout(() => {
+          pdfFrame.src = safeFile;
+        }, 80);
+      });
+    } else {
+      downloadButton.setAttribute('aria-disabled', 'true');
+      downloadButton.removeAttribute('href');
+      openExternalButton.setAttribute('aria-disabled', 'true');
+      openExternalButton.removeAttribute('href');
+      showFallback('Nenhum PDF foi informado para este material.');
+    }
+
+    pdfFrame.addEventListener('error', () => {
+      showFallback('O navegador não conseguiu carregar este PDF dentro da página.');
+    });
+  </script>
+</body>
+</html>
