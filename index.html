@@ -824,12 +824,13 @@
         radial-gradient(circle at 50% 36%, rgba(0, 109, 255, 0.22), transparent 22rem),
         radial-gradient(circle at 82% 10%, rgba(0, 213, 200, 0.10), transparent 28rem),
         linear-gradient(180deg, rgba(0, 2, 8, 0.96), rgba(1, 7, 22, 0.98) 52%, rgba(0, 0, 0, 0.99));
-      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.88), inset 0 0 80px rgba(0, 56, 148, 0.18);
-      backdrop-filter: blur(22px);
+      box-shadow: inset 0 0 110px rgba(0, 0, 0, 0.78), inset 0 0 60px rgba(0, 56, 148, 0.14);
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.85s ease, visibility 0s linear 0.85s, background 0.85s ease;
+      contain: layout paint style;
+      will-change: opacity;
+      transition: opacity 0.42s ease, visibility 0s linear 0.42s, background 0.42s ease;
     }
 
     body.focus-mode .focus-widget {
@@ -842,9 +843,7 @@
     body.focus-mode:not(.focus-materials-view) main,
     body.focus-mode:not(.focus-materials-view) .navbar,
     body.focus-mode:not(.focus-materials-view) footer {
-      filter: blur(10px);
-      transform: scale(0.985);
-      transition: filter 0.85s ease, transform 0.85s ease;
+      transition: none;
     }
 
     .focus-stage {
@@ -1210,6 +1209,23 @@
     body.focus-mode.focus-materials-view .apg-topic-number {
       color: var(--branco);
       background: rgba(0, 109, 255, 0.22);
+    }
+
+    body.focus-cleanup,
+    body.focus-cleanup .focus-widget,
+    body.focus-cleanup .materials-panel,
+    body.focus-cleanup .tab-button,
+    body.focus-cleanup .period-button,
+    body.focus-cleanup .module-button,
+    body.focus-cleanup .discipline-button,
+    body.focus-cleanup .apg-period-button,
+    body.focus-cleanup .apg-module-button,
+    body.focus-cleanup .summary-item,
+    body.focus-cleanup .apg-topic-item,
+    body.focus-cleanup .search-box,
+    body.focus-cleanup .eyebrow {
+      transition-duration: 0.08s !important;
+      animation-duration: 0.08s !important;
     }
 
     .material-meta {
@@ -2780,7 +2796,10 @@
       restSeconds: 0,
       elapsed: 0,
       cycles: 0,
+      lastTickAt: Date.now(),
+      materialsView: false,
     };
+    const focusStorageKey = 'tnmed.focus.state.v1';
     const moduleNames = {
       soi: 'SOI',
       ham: 'HAM',
@@ -3061,6 +3080,95 @@
       return `${minutes}:${seconds}`;
     }
 
+    function saveFocusState() {
+      try {
+        if (focusState.active) {
+          sessionStorage.setItem(focusStorageKey, JSON.stringify(focusState));
+        } else {
+          sessionStorage.removeItem(focusStorageKey);
+        }
+      } catch (error) {
+        // Session storage can be unavailable in some restricted browser modes.
+      }
+    }
+
+    function readSavedFocusState() {
+      try {
+        const saved = sessionStorage.getItem(focusStorageKey);
+        if (!saved) return null;
+
+        const parsed = JSON.parse(saved);
+        if (!parsed || parsed.active !== true) return null;
+
+        return {
+          active: true,
+          paused: parsed.paused === true,
+          phase: parsed.phase === 'rest' ? 'rest' : 'focus',
+          method: parsed.method || 'Modo foco',
+          focusSeconds: Math.max(Number(parsed.focusSeconds) || 1500, 1),
+          restSeconds: Math.max(Number(parsed.restSeconds) || 300, 1),
+          elapsed: Math.max(Number(parsed.elapsed) || 0, 0),
+          cycles: Math.max(Number(parsed.cycles) || 0, 0),
+          lastTickAt: Number(parsed.lastTickAt) || Date.now(),
+          materialsView: parsed.materialsView === true,
+        };
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function advanceFocusClock() {
+      if (!focusState.active || focusState.paused) return null;
+
+      const now = Date.now();
+      if (!Number.isFinite(focusState.lastTickAt)) {
+        focusState.lastTickAt = now;
+      }
+
+      let delta = Math.floor((now - focusState.lastTickAt) / 1000);
+      if (delta <= 0) return null;
+
+      focusState.lastTickAt += delta * 1000;
+      let lastTransition = null;
+
+      while (delta > 0 && focusState.active) {
+        const targetSeconds = focusState.phase === 'focus' ? focusState.focusSeconds : focusState.restSeconds;
+        const remaining = Math.max(targetSeconds - focusState.elapsed, 1);
+
+        if (delta >= remaining) {
+          delta -= remaining;
+          focusState.elapsed = 0;
+
+          if (focusState.phase === 'focus') {
+            focusState.cycles += 1;
+            focusState.phase = 'rest';
+            lastTransition = 'focus-complete';
+          } else {
+            focusState.phase = 'focus';
+            lastTransition = 'rest-complete';
+          }
+        } else {
+          focusState.elapsed += delta;
+          delta = 0;
+        }
+      }
+
+      return lastTransition;
+    }
+
+    function showFocusTransition(transition) {
+      if (transition === 'focus-complete') {
+        showFocusAlert(
+          'Parabéns Dr.(a) você conseguiu! Até a próxima',
+          `Ciclo concluído. Agora começa um descanso de ${Math.round(focusState.restSeconds / 60)} min. Você pode continuar no método ou encerrar o modo foco.`
+        );
+      }
+
+      if (transition === 'rest-complete') {
+        showFocusAlert('Descanso concluído', 'O próximo ciclo começou. Mantenha o ritmo ou encerre quando quiser.');
+      }
+    }
+
     function updateFocusDisplay() {
       if (!focusState.active) return;
 
@@ -3089,15 +3197,19 @@
       focusState.phase = 'focus';
       focusState.elapsed = 0;
       focusState.paused = false;
+      focusState.lastTickAt = Date.now();
       hideFocusAlert();
       updateFocusDisplay();
+      saveFocusState();
     }
 
     function startRestPhase() {
       focusState.phase = 'rest';
       focusState.elapsed = 0;
       focusState.paused = false;
+      focusState.lastTickAt = Date.now();
       updateFocusDisplay();
+      saveFocusState();
     }
 
     function completeFocusPhase() {
@@ -3115,20 +3227,11 @@
     }
 
     function tickFocusTimer() {
-      if (!focusState.active || focusState.paused) return;
-
-      focusState.elapsed += 1;
-      const targetSeconds = focusState.phase === 'focus' ? focusState.focusSeconds : focusState.restSeconds;
-
-      if (focusState.elapsed >= targetSeconds) {
-        if (focusState.phase === 'focus') {
-          completeFocusPhase();
-        } else {
-          completeRestPhase();
-        }
-      }
-
+      if (!focusState.active) return;
+      const transition = advanceFocusClock();
+      showFocusTransition(transition);
       updateFocusDisplay();
+      saveFocusState();
     }
 
     function enterFocusMode(card) {
@@ -3137,6 +3240,7 @@
       const restMinutes = Number(card.dataset.restMinutes || 5);
 
       window.clearInterval(focusInterval);
+      document.body.classList.remove('focus-cleanup');
       focusState = {
         active: true,
         paused: false,
@@ -3146,6 +3250,8 @@
         restSeconds: Math.max(restMinutes * 60, 1),
         elapsed: 0,
         cycles: 0,
+        lastTickAt: Date.now(),
+        materialsView: false,
       };
 
       document.body.classList.add('focus-mode');
@@ -3153,6 +3259,7 @@
       focusMaterialsButton.textContent = 'Ver materiais';
       hideFocusAlert();
       updateFocusDisplay();
+      saveFocusState();
       focusInterval = window.setInterval(tickFocusTimer, 1000);
     }
 
@@ -3162,16 +3269,24 @@
       focusState.active = false;
       focusState.paused = false;
       focusState.elapsed = 0;
+      focusState.materialsView = false;
+      document.body.classList.add('focus-cleanup');
       document.body.classList.remove('focus-mode', 'focus-materials-view');
       focusMaterialsButton.textContent = 'Ver materiais';
       hideFocusAlert();
+      saveFocusState();
+      window.setTimeout(() => {
+        document.body.classList.remove('focus-cleanup');
+      }, 180);
     }
 
     function toggleFocusMaterialsView() {
       if (!focusState.active) return;
 
       const showingMaterials = document.body.classList.toggle('focus-materials-view');
+      focusState.materialsView = showingMaterials;
       focusMaterialsButton.textContent = showingMaterials ? 'Voltar ao foco' : 'Ver materiais';
+      saveFocusState();
 
       if (showingMaterials) {
         activateTab('resumos');
@@ -3185,14 +3300,39 @@
 
     function toggleFocusPause() {
       if (!focusState.active) return;
+      advanceFocusClock();
       focusState.paused = !focusState.paused;
+      focusState.lastTickAt = Date.now();
       updateFocusDisplay();
+      saveFocusState();
     }
 
     function skipRest() {
       if (!focusState.active || focusState.phase !== 'rest') return;
       startFocusPhase();
       showFocusAlert('Descanso pulado', 'O próximo ciclo já começou.');
+    }
+
+    function restoreFocusMode() {
+      const savedState = readSavedFocusState();
+      if (!savedState) return;
+
+      window.clearInterval(focusInterval);
+      focusState = savedState;
+      const transition = advanceFocusClock();
+
+      document.body.classList.add('focus-mode');
+      document.body.classList.toggle('focus-materials-view', focusState.materialsView);
+      focusMaterialsButton.textContent = focusState.materialsView ? 'Voltar ao foco' : 'Ver materiais';
+
+      if (focusState.materialsView) {
+        activateTab('resumos');
+      }
+
+      updateFocusDisplay();
+      showFocusTransition(transition);
+      saveFocusState();
+      focusInterval = window.setInterval(tickFocusTimer, 1000);
     }
 
     function filterCards() {
@@ -3256,6 +3396,14 @@
     focusEndButton.addEventListener('click', endFocusMode);
     focusContinueButton.addEventListener('click', hideFocusAlert);
     focusAlertEndButton.addEventListener('click', endFocusMode);
+    window.addEventListener('pagehide', saveFocusState);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveFocusState();
+      } else {
+        tickFocusTimer();
+      }
+    });
 
     periodButtons.forEach((button) => {
       button.addEventListener('click', () => {
@@ -3304,6 +3452,7 @@
     renderSummaryBrowser();
     renderAPGBrowser();
     preparePDFLinks();
+    restoreFocusMode();
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -3335,7 +3484,9 @@
     window.addEventListener('load', () => window.setTimeout(updateAmbientElectrosphere, 120));
     window.addEventListener('hashchange', () => window.setTimeout(updateAmbientElectrosphere, 120));
 
-    window.addEventListener('scroll', () => {
+    let scrollFramePending = false;
+    function updateScrollEffects() {
+      scrollFramePending = false;
       const currentPosition = window.scrollY + 120;
       updateAmbientElectrosphere();
 
@@ -3350,6 +3501,12 @@
           });
         }
       });
+    }
+
+    window.addEventListener('scroll', () => {
+      if (scrollFramePending) return;
+      scrollFramePending = true;
+      window.requestAnimationFrame(updateScrollEffects);
     }, { passive: true });
   </script>
 </body>

@@ -43,6 +43,15 @@
         radial-gradient(circle at 90% 2%, rgba(0, 213, 200, 0.20), transparent 30rem),
         linear-gradient(180deg, #f8fcff 0%, #eef8ff 52%, #ffffff 100%);
       overflow-x: hidden;
+      transition: background 0.55s ease, color 0.55s ease;
+    }
+
+    body.focus-reader {
+      color: var(--branco);
+      background:
+        radial-gradient(circle at 82% 8%, rgba(0, 70, 180, 0.28), transparent 34rem),
+        radial-gradient(circle at 12% 18%, rgba(0, 213, 200, 0.10), transparent 28rem),
+        linear-gradient(180deg, #01030b 0%, #020817 50%, #00040d 100%);
     }
 
     a,
@@ -134,6 +143,88 @@
       box-shadow: 0 16px 34px rgba(0, 109, 255, 0.22);
     }
 
+    .focus-reader .navbar {
+      border-color: rgba(0, 109, 255, 0.28);
+      background: rgba(1, 8, 25, 0.86);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+    }
+
+    .focus-reader .brand,
+    .focus-reader h1,
+    .focus-reader .viewer-status,
+    .focus-reader footer {
+      color: var(--branco);
+    }
+
+    .focus-reader .btn {
+      color: var(--branco);
+      border-color: rgba(0, 213, 200, 0.24);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: none;
+    }
+
+    .focus-reader .btn-primary {
+      background: linear-gradient(135deg, rgba(0, 109, 255, 0.76), rgba(0, 213, 200, 0.42));
+      box-shadow: 0 16px 34px rgba(0, 109, 255, 0.18);
+    }
+
+    .focus-reader-bar {
+      display: none;
+      position: sticky;
+      top: 70px;
+      z-index: 18;
+      border-bottom: 1px solid rgba(0, 213, 200, 0.18);
+      background: rgba(0, 4, 13, 0.86);
+      backdrop-filter: blur(20px);
+    }
+
+    .focus-reader .focus-reader-bar {
+      display: block;
+    }
+
+    .focus-reader-inner {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--branco);
+    }
+
+    .focus-reader-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 950;
+    }
+
+    .focus-reader-label {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .focus-reader-timer {
+      color: var(--branco);
+      font-size: clamp(1.45rem, 4vw, 2.15rem);
+      line-height: 1;
+      text-shadow: 0 0 28px rgba(0, 109, 255, 0.48);
+      white-space: nowrap;
+    }
+
+    .focus-reader-chip {
+      padding: 7px 10px;
+      border: 1px solid rgba(0, 213, 200, 0.22);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(0, 109, 255, 0.18);
+      font-size: 0.76rem;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
     .hero {
       padding: 34px 0 18px;
     }
@@ -173,6 +264,12 @@
       overflow: hidden;
     }
 
+    .focus-reader .viewer-panel {
+      border-color: rgba(0, 109, 255, 0.28);
+      background: rgba(1, 8, 25, 0.78);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32), 0 0 42px rgba(0, 109, 255, 0.14);
+    }
+
     .viewer-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -198,6 +295,12 @@
       overflow: hidden;
     }
 
+    .focus-reader .pdf-frame {
+      border-color: rgba(0, 213, 200, 0.20);
+      background: #050914;
+      box-shadow: 0 0 0 1px rgba(0, 109, 255, 0.10), 0 18px 42px rgba(0, 0, 0, 0.30);
+    }
+
     .pdf-frame iframe {
       width: 100%;
       height: 100%;
@@ -218,6 +321,24 @@
 
     .fallback strong {
       color: var(--azul-profundo);
+    }
+
+    .focus-reader .fallback {
+      color: rgba(255, 255, 255, 0.78);
+      border-color: rgba(0, 213, 200, 0.26);
+      background: rgba(0, 4, 13, 0.72);
+    }
+
+    .focus-reader .fallback strong {
+      color: var(--branco);
+    }
+
+    .back-float {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 30;
+      box-shadow: 0 18px 42px rgba(0, 43, 138, 0.16);
     }
 
     footer {
@@ -242,6 +363,20 @@
         width: 100%;
         display: grid;
         grid-template-columns: 1fr;
+      }
+
+      .focus-reader-bar {
+        top: 0;
+      }
+
+      .focus-reader-inner,
+      .focus-reader-meta {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .focus-reader-inner {
+        padding: 10px 0;
       }
 
       .btn {
@@ -290,6 +425,18 @@
     </div>
   </header>
 
+  <div class="focus-reader-bar" id="focusReaderBar" aria-live="polite">
+    <div class="shell focus-reader-inner">
+      <div class="focus-reader-meta">
+        <span class="focus-reader-label" id="focusReaderMethod">Modo foco ativo</span>
+        <span class="focus-reader-timer" id="focusReaderTimer">00:00</span>
+        <span class="focus-reader-chip" id="focusReaderPhase">Foco</span>
+        <span class="focus-reader-chip" id="focusReaderCycles">Ciclos: 0</span>
+      </div>
+      <button class="btn" type="button" id="focusReaderEndButton">Encerrar modo foco</button>
+    </div>
+  </div>
+
   <main>
     <section class="hero">
       <div class="shell">
@@ -307,7 +454,10 @@
     <section class="viewer-panel shell">
       <div class="viewer-toolbar">
         <p class="viewer-status" id="viewerStatus">Carregando o material no leitor interno.</p>
-        <a class="btn" id="openExternalButton" href="#" target="_blank" rel="noopener">Abrir em nova aba</a>
+        <div class="viewer-actions">
+          <button class="btn" type="button" id="inlineBackButton">Voltar ao site</button>
+          <a class="btn" id="openExternalButton" href="#" target="_blank" rel="noopener">Abrir em nova aba</a>
+        </div>
       </div>
 
       <div class="pdf-frame" id="pdfFrameWrap">
@@ -327,6 +477,8 @@
     </div>
   </footer>
 
+  <button class="btn back-float" type="button" id="floatingBackButton">Voltar ao site</button>
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const file = params.get('file') || '';
@@ -339,7 +491,17 @@
     const downloadButton = document.querySelector('#downloadButton');
     const openExternalButton = document.querySelector('#openExternalButton');
     const backButton = document.querySelector('#backButton');
+    const inlineBackButton = document.querySelector('#inlineBackButton');
+    const floatingBackButton = document.querySelector('#floatingBackButton');
     const brandHome = document.querySelector('#brandHome');
+    const focusReaderMethod = document.querySelector('#focusReaderMethod');
+    const focusReaderTimer = document.querySelector('#focusReaderTimer');
+    const focusReaderPhase = document.querySelector('#focusReaderPhase');
+    const focusReaderCycles = document.querySelector('#focusReaderCycles');
+    const focusReaderEndButton = document.querySelector('#focusReaderEndButton');
+    const focusStorageKey = 'tnmed.focus.state.v1';
+    let focusReaderInterval = null;
+    let focusState = null;
 
     function safeFilePath(value) {
       const trimmed = value.trim();
@@ -355,6 +517,113 @@
       fallbackMessage.style.display = 'block';
     }
 
+    function formatFocusTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    function readFocusState() {
+      try {
+        const saved = sessionStorage.getItem(focusStorageKey);
+        if (!saved) return null;
+        const parsed = JSON.parse(saved);
+        if (!parsed || parsed.active !== true) return null;
+
+        return {
+          active: true,
+          paused: parsed.paused === true,
+          phase: parsed.phase === 'rest' ? 'rest' : 'focus',
+          method: parsed.method || 'Modo foco',
+          focusSeconds: Math.max(Number(parsed.focusSeconds) || 1500, 1),
+          restSeconds: Math.max(Number(parsed.restSeconds) || 300, 1),
+          elapsed: Math.max(Number(parsed.elapsed) || 0, 0),
+          cycles: Math.max(Number(parsed.cycles) || 0, 0),
+          lastTickAt: Number(parsed.lastTickAt) || Date.now(),
+          materialsView: parsed.materialsView === true,
+        };
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function saveFocusState() {
+      try {
+        if (focusState && focusState.active) {
+          sessionStorage.setItem(focusStorageKey, JSON.stringify(focusState));
+        } else {
+          sessionStorage.removeItem(focusStorageKey);
+        }
+      } catch (error) {
+        // Some embedded or privacy-restricted contexts can block session storage.
+      }
+    }
+
+    function advanceFocusClock() {
+      if (!focusState || !focusState.active || focusState.paused) return;
+
+      const now = Date.now();
+      if (!Number.isFinite(focusState.lastTickAt)) {
+        focusState.lastTickAt = now;
+      }
+
+      let delta = Math.floor((now - focusState.lastTickAt) / 1000);
+      if (delta <= 0) return;
+
+      focusState.lastTickAt += delta * 1000;
+
+      while (delta > 0 && focusState.active) {
+        const targetSeconds = focusState.phase === 'focus' ? focusState.focusSeconds : focusState.restSeconds;
+        const remaining = Math.max(targetSeconds - focusState.elapsed, 1);
+
+        if (delta >= remaining) {
+          delta -= remaining;
+          focusState.elapsed = 0;
+
+          if (focusState.phase === 'focus') {
+            focusState.cycles += 1;
+            focusState.phase = 'rest';
+          } else {
+            focusState.phase = 'focus';
+          }
+        } else {
+          focusState.elapsed += delta;
+          delta = 0;
+        }
+      }
+    }
+
+    function updateFocusReader() {
+      if (!focusState || !focusState.active) {
+        document.body.classList.remove('focus-reader');
+        return;
+      }
+
+      advanceFocusClock();
+      document.body.classList.add('focus-reader');
+      focusReaderMethod.textContent = focusState.method;
+      focusReaderTimer.textContent = formatFocusTime(focusState.elapsed);
+      focusReaderPhase.textContent = focusState.phase === 'focus' ? 'Foco' : 'Descanso';
+      focusReaderCycles.textContent = `Ciclos: ${focusState.cycles}`;
+      saveFocusState();
+    }
+
+    function startFocusReader() {
+      focusState = readFocusState();
+      if (!focusState) return;
+
+      updateFocusReader();
+      focusReaderInterval = window.setInterval(updateFocusReader, 1000);
+    }
+
+    function endFocusReader() {
+      window.clearInterval(focusReaderInterval);
+      focusReaderInterval = null;
+      focusState = null;
+      saveFocusState();
+      document.body.classList.remove('focus-reader');
+    }
+
     const safeFile = safeFilePath(file);
     viewerTitle.textContent = title;
     document.title = `${title} | Túlyo Neves`;
@@ -363,11 +632,24 @@
       brandHome.href = document.referrer;
     }
 
-    backButton.addEventListener('click', () => {
+    function goBackToMaterials() {
       if (window.history.length > 1) {
         window.history.back();
       } else {
         window.location.href = brandHome.href;
+      }
+    }
+
+    backButton.addEventListener('click', goBackToMaterials);
+    inlineBackButton.addEventListener('click', goBackToMaterials);
+    floatingBackButton.addEventListener('click', goBackToMaterials);
+    focusReaderEndButton.addEventListener('click', endFocusReader);
+    window.addEventListener('pagehide', saveFocusState);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveFocusState();
+      } else {
+        updateFocusReader();
       }
     });
 
@@ -391,6 +673,8 @@
     pdfFrame.addEventListener('error', () => {
       showFallback('O navegador não conseguiu carregar este PDF dentro da página.');
     });
+
+    startFocusReader();
   </script>
 </body>
 </html>
