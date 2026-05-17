@@ -820,10 +820,11 @@
       border: 0;
       border-radius: 0;
       color: var(--branco);
+      background-color: #000208;
       background:
         radial-gradient(circle at 50% 36%, rgba(0, 109, 255, 0.22), transparent 22rem),
         radial-gradient(circle at 82% 10%, rgba(0, 213, 200, 0.10), transparent 28rem),
-        linear-gradient(180deg, rgba(0, 2, 8, 0.96), rgba(1, 7, 22, 0.98) 52%, rgba(0, 0, 0, 0.99));
+        linear-gradient(180deg, #000208 0%, #010716 52%, #000000 100%);
       box-shadow: inset 0 0 110px rgba(0, 0, 0, 0.78), inset 0 0 60px rgba(0, 56, 148, 0.14);
       opacity: 0;
       visibility: hidden;
@@ -966,21 +967,44 @@
     .focus-timer-toggle {
       display: none;
       position: fixed;
-      right: 14px;
-      top: 14px;
+      right: 18px;
+      bottom: 18px;
       z-index: 86;
-      width: 42px;
-      height: 42px;
+      width: 54px;
+      height: 54px;
       place-items: center;
       border: 1px solid rgba(0, 213, 200, 0.24);
       border-radius: 999px;
       color: var(--branco);
-      background: rgba(1, 8, 25, 0.76);
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.26), 0 0 24px rgba(0, 109, 255, 0.18);
-      font-size: 1.05rem;
-      font-weight: 950;
+      background: rgba(1, 8, 25, 0.88);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34), 0 0 28px rgba(0, 109, 255, 0.22);
       line-height: 1;
       cursor: pointer;
+      touch-action: none;
+      user-select: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .focus-timer-toggle svg {
+      width: 23px;
+      height: 23px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .focus-timer-toggle:hover,
+    body.focus-mode.focus-materials-view.focus-dock-open .focus-timer-toggle {
+      transform: translateY(-2px);
+      background: rgba(0, 109, 255, 0.28);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38), 0 0 34px rgba(0, 213, 200, 0.24);
+    }
+
+    .focus-timer-toggle.is-dragging {
+      cursor: grabbing;
+      transition: none;
+      transform: scale(1.02);
     }
 
     .focus-control {
@@ -1013,20 +1037,33 @@
     }
 
     body.focus-mode.focus-materials-view .focus-widget {
-      inset: auto 18px 18px auto;
-      width: min(390px, calc(100% - 32px));
+      inset: auto 18px 84px auto;
+      width: min(342px, calc(100% - 32px));
       min-height: auto;
-      padding: 16px;
+      padding: 14px;
       border: 1px solid rgba(0, 213, 200, 0.26);
-      border-radius: 24px;
+      border-radius: 22px;
       background: rgba(1, 7, 22, 0.92);
       box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42), 0 0 44px rgba(0, 109, 255, 0.20);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(8px) scale(0.96);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+    }
+
+    body.focus-mode.focus-materials-view.focus-dock-open .focus-widget {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      transition-delay: 0s;
     }
 
     body.focus-mode.focus-materials-view .focus-stage {
       justify-items: stretch;
       align-content: start;
-      gap: 10px;
+      gap: 8px;
       max-height: none;
       overflow: visible;
       text-align: left;
@@ -1049,10 +1086,26 @@
     body.focus-mode.focus-materials-view .focus-phase {
       position: static;
       transform: none;
+      padding: 5px 8px;
+      font-size: 0.62rem;
     }
 
     body.focus-mode.focus-materials-view .focus-timer {
-      font-size: clamp(2.5rem, 10vw, 4.2rem);
+      font-size: clamp(1.85rem, 5vw, 2.6rem);
+      text-shadow: 0 0 24px rgba(0, 109, 255, 0.46), 0 0 42px rgba(0, 213, 200, 0.16);
+    }
+
+    body.focus-mode.focus-materials-view .focus-widget-label {
+      font-size: 0.58rem;
+    }
+
+    body.focus-mode.focus-materials-view .focus-widget-name {
+      font-size: 0.98rem;
+    }
+
+    body.focus-mode.focus-materials-view .focus-widget-meta {
+      gap: 6px;
+      font-size: 0.68rem;
     }
 
     body.focus-mode.focus-materials-view .focus-widget-actions {
@@ -1062,7 +1115,9 @@
 
     body.focus-mode.focus-materials-view .focus-control {
       min-width: 0;
-      padding: 0 12px;
+      min-height: 34px;
+      padding: 0 10px;
+      font-size: 0.68rem;
     }
 
     body.focus-mode.focus-materials-view .focus-control.end {
@@ -1070,7 +1125,7 @@
     }
 
     body.focus-mode.focus-materials-view .focus-timer-toggle {
-      display: none;
+      display: grid;
     }
 
     body.focus-mode.focus-materials-view .hero,
@@ -1135,6 +1190,7 @@
 
     body.focus-mode:not(.focus-materials-view) {
       overflow: hidden;
+      background: #000208;
     }
 
     body.focus-mode.focus-materials-view {
@@ -1295,6 +1351,16 @@
     .material-link:hover {
       color: var(--azul-profundo);
       transform: translateX(3px);
+    }
+
+    .material-link.unavailable {
+      cursor: default;
+      opacity: 0.62;
+    }
+
+    .material-link.unavailable:hover {
+      color: var(--azul-vivo);
+      transform: none;
     }
 
     .level {
@@ -2348,22 +2414,16 @@
       }
 
       .focus-timer-toggle {
-        display: grid;
-      }
-
-      body.focus-timer-collapsed:not(.focus-materials-view) .focus-timer,
-      body.focus-timer-collapsed:not(.focus-materials-view) .focus-widget-meta {
-        display: none;
-      }
-
-      body.focus-timer-collapsed:not(.focus-materials-view) .focus-stage {
-        gap: 10px;
+        width: 48px;
+        height: 48px;
+        right: 12px;
+        bottom: 12px;
       }
 
       body.focus-mode.focus-materials-view .focus-widget {
         left: 10px;
         right: 10px;
-        bottom: 10px;
+        bottom: 74px;
         width: auto;
         padding: 12px;
         border-radius: 18px;
@@ -2638,7 +2698,7 @@
                 </div>
                 <div class="material-actions">
                   <span class="level">Treino</span>
-                  <a class="material-link" href="pdfs/simulados/soi-ii/simulado-integrado-01.pdf" target="_blank">Abrir PDF →</a>
+                  <span class="material-link unavailable">Em breve</span>
                 </div>
               </article>
 
@@ -2653,7 +2713,7 @@
                 </div>
                 <div class="material-actions">
                   <span class="level">Treino</span>
-                  <a class="material-link" href="pdfs/simulados/ham-ii/simulado-ham-ii-01.pdf" target="_blank">Abrir PDF →</a>
+                  <span class="material-link unavailable">Em breve</span>
                 </div>
               </article>
 
@@ -2668,7 +2728,7 @@
                 </div>
                 <div class="material-actions">
                   <span class="level">Treino</span>
-                  <a class="material-link" href="pdfs/simulados/iesc-ii/simulado-iesc-ii-01.pdf" target="_blank">Abrir PDF →</a>
+                  <span class="material-link unavailable">Em breve</span>
                 </div>
               </article>
             </div>
@@ -2897,8 +2957,16 @@
         <button class="focus-control end" id="focusEndButton" type="button">Encerrar modo foco</button>
       </div>
     </div>
-    <button class="focus-timer-toggle" id="focusTimerToggle" type="button" aria-expanded="true" aria-label="Ocultar cronômetro">▼</button>
   </aside>
+
+  <button class="focus-timer-toggle" id="focusTimerToggle" type="button" aria-expanded="false" aria-label="Mostrar cronômetro">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 2h4"></path>
+      <path d="M12 14l3-3"></path>
+      <circle cx="12" cy="14" r="8"></circle>
+      <path d="M9 2h6"></path>
+    </svg>
+  </button>
 
   <div class="focus-alert" id="focusAlert" role="status" aria-live="assertive">
     <strong id="focusAlertTitle">Parabéns Dr.(a) você conseguiu! Até a próxima</strong>
@@ -2970,6 +3038,9 @@
       lastTickAt: Date.now(),
       materialsView: false,
     };
+    let focusTogglePointer = null;
+    let focusToggleMoved = false;
+    let focusToggleSuppressClick = false;
     const focusStorageKey = 'tnmed.focus.state.v1';
     const moduleNames = {
       soi: 'SOI',
@@ -3340,15 +3411,136 @@
       }
     }
 
-    function setFocusTimerCollapsed(collapsed) {
-      document.body.classList.toggle('focus-timer-collapsed', collapsed);
-      focusTimerToggle.textContent = collapsed ? '▲' : '▼';
-      focusTimerToggle.setAttribute('aria-expanded', String(!collapsed));
-      focusTimerToggle.setAttribute('aria-label', collapsed ? 'Mostrar cronômetro' : 'Ocultar cronômetro');
+    function setFocusDockOpen(open) {
+      document.body.classList.toggle('focus-dock-open', open);
+      focusTimerToggle.setAttribute('aria-expanded', String(open));
+      focusTimerToggle.setAttribute('aria-label', open ? 'Ocultar cronômetro' : 'Mostrar cronômetro');
     }
 
     function toggleFocusTimerVisibility() {
-      setFocusTimerCollapsed(!document.body.classList.contains('focus-timer-collapsed'));
+      setFocusDockOpen(!document.body.classList.contains('focus-dock-open'));
+    }
+
+    function placeFocusTimerToggle(left, top) {
+      const margin = 8;
+      const width = focusTimerToggle.offsetWidth || 54;
+      const height = focusTimerToggle.offsetHeight || 54;
+      const nextLeft = Math.min(Math.max(left, margin), window.innerWidth - width - margin);
+      const nextTop = Math.min(Math.max(top, margin), window.innerHeight - height - margin);
+      focusTimerToggle.style.left = `${nextLeft}px`;
+      focusTimerToggle.style.top = `${nextTop}px`;
+      focusTimerToggle.style.right = 'auto';
+      focusTimerToggle.style.bottom = 'auto';
+      sessionStorage.setItem('tnmed.focus.toggle.position.v1', JSON.stringify({ left: nextLeft, top: nextTop }));
+    }
+
+    function restoreFocusTimerTogglePosition() {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem('tnmed.focus.toggle.position.v1') || 'null');
+        if (!saved) return;
+        placeFocusTimerToggle(Number(saved.left) || 18, Number(saved.top) || 18);
+      } catch (error) {
+        focusTimerToggle.removeAttribute('style');
+      }
+    }
+
+    function keepFocusTimerToggleInViewport() {
+      if (!focusTimerToggle.style.left || !focusTimerToggle.style.top) return;
+      const rect = focusTimerToggle.getBoundingClientRect();
+      placeFocusTimerToggle(rect.left, rect.top);
+    }
+
+    function startFocusTimerToggleDrag(event) {
+      if (!document.body.classList.contains('focus-materials-view')) return;
+      event.preventDefault();
+      const rect = focusTimerToggle.getBoundingClientRect();
+      focusTogglePointer = {
+        id: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        left: rect.left,
+        top: rect.top,
+      };
+      focusToggleMoved = false;
+      focusTimerToggle.setPointerCapture(event.pointerId);
+    }
+
+    function startFocusTimerToggleMouseDrag(event) {
+      if (focusTogglePointer || !document.body.classList.contains('focus-materials-view') || event.button !== 0) return;
+      event.preventDefault();
+      const rect = focusTimerToggle.getBoundingClientRect();
+      focusTogglePointer = {
+        id: 'mouse',
+        startX: event.clientX,
+        startY: event.clientY,
+        left: rect.left,
+        top: rect.top,
+      };
+      focusToggleMoved = false;
+      document.addEventListener('mousemove', moveFocusTimerToggleMouse);
+      document.addEventListener('mouseup', endFocusTimerToggleMouse, { once: true });
+    }
+
+    function moveFocusTimerToggle(event) {
+      if (!focusTogglePointer || focusTogglePointer.id !== event.pointerId) return;
+      const deltaX = event.clientX - focusTogglePointer.startX;
+      const deltaY = event.clientY - focusTogglePointer.startY;
+
+      if (Math.abs(deltaX) + Math.abs(deltaY) > 4) {
+        focusToggleMoved = true;
+        focusTimerToggle.classList.add('is-dragging');
+      }
+
+      if (focusToggleMoved) {
+        placeFocusTimerToggle(focusTogglePointer.left + deltaX, focusTogglePointer.top + deltaY);
+      }
+    }
+
+    function moveFocusTimerToggleMouse(event) {
+      if (!focusTogglePointer || focusTogglePointer.id !== 'mouse') return;
+      const deltaX = event.clientX - focusTogglePointer.startX;
+      const deltaY = event.clientY - focusTogglePointer.startY;
+
+      if (Math.abs(deltaX) + Math.abs(deltaY) > 4) {
+        focusToggleMoved = true;
+        focusTimerToggle.classList.add('is-dragging');
+      }
+
+      if (focusToggleMoved) {
+        placeFocusTimerToggle(focusTogglePointer.left + deltaX, focusTogglePointer.top + deltaY);
+      }
+    }
+
+    function endFocusTimerToggleDrag(event) {
+      if (!focusTogglePointer || focusTogglePointer.id !== event.pointerId) return;
+      try {
+        focusTimerToggle.releasePointerCapture(event.pointerId);
+      } catch (error) {
+        // The browser may release capture automatically after touch cancellation.
+      }
+      focusTimerToggle.classList.remove('is-dragging');
+      focusTogglePointer = null;
+
+      if (focusToggleMoved) {
+        focusToggleSuppressClick = true;
+        window.setTimeout(() => {
+          focusToggleSuppressClick = false;
+        }, 0);
+      }
+    }
+
+    function endFocusTimerToggleMouse() {
+      if (!focusTogglePointer || focusTogglePointer.id !== 'mouse') return;
+      document.removeEventListener('mousemove', moveFocusTimerToggleMouse);
+      focusTimerToggle.classList.remove('is-dragging');
+      focusTogglePointer = null;
+
+      if (focusToggleMoved) {
+        focusToggleSuppressClick = true;
+        window.setTimeout(() => {
+          focusToggleSuppressClick = false;
+        }, 0);
+      }
     }
 
     function updateFocusDisplay() {
@@ -3437,8 +3629,8 @@
       };
 
       document.body.classList.add('focus-mode');
-      document.body.classList.remove('focus-materials-view');
-      setFocusTimerCollapsed(false);
+      document.body.classList.remove('focus-materials-view', 'focus-dock-open');
+      setFocusDockOpen(false);
       focusMaterialsButton.textContent = 'Ver materiais';
       hideFocusAlert();
       updateFocusDisplay();
@@ -3454,8 +3646,8 @@
       focusState.elapsed = 0;
       focusState.materialsView = false;
       document.body.classList.add('focus-cleanup');
-      document.body.classList.remove('focus-mode', 'focus-materials-view');
-      setFocusTimerCollapsed(false);
+      document.body.classList.remove('focus-mode', 'focus-materials-view', 'focus-dock-open');
+      setFocusDockOpen(false);
       focusMaterialsButton.textContent = 'Ver materiais';
       hideFocusAlert();
       saveFocusState();
@@ -3467,18 +3659,26 @@
     function toggleFocusMaterialsView() {
       if (!focusState.active) return;
 
-      const showingMaterials = document.body.classList.toggle('focus-materials-view');
+      const showingMaterials = !document.body.classList.contains('focus-materials-view');
       focusState.materialsView = showingMaterials;
       focusMaterialsButton.textContent = showingMaterials ? 'Voltar ao foco' : 'Ver materiais';
+      setFocusDockOpen(false);
       saveFocusState();
 
       if (showingMaterials) {
         activateTab('resumos');
-        const resumosSection = document.querySelector('#resumos');
-        const scrollTarget = Math.max(resumosSection.offsetTop, 0);
-        const scrollRoot = document.scrollingElement || document.documentElement;
-        scrollRoot.scrollTop = scrollTarget;
-        document.body.scrollTop = scrollTarget;
+        window.requestAnimationFrame(() => {
+          document.body.classList.add('focus-materials-view');
+          restoreFocusTimerTogglePosition();
+          window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+          });
+        });
+      } else {
+        document.body.classList.remove('focus-materials-view');
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        });
       }
     }
 
@@ -3507,10 +3707,12 @@
 
       document.body.classList.add('focus-mode');
       document.body.classList.toggle('focus-materials-view', focusState.materialsView);
+      setFocusDockOpen(false);
       focusMaterialsButton.textContent = focusState.materialsView ? 'Voltar ao foco' : 'Ver materiais';
 
       if (focusState.materialsView) {
         activateTab('resumos');
+        restoreFocusTimerTogglePosition();
       }
 
       updateFocusDisplay();
@@ -3574,7 +3776,16 @@
       });
     });
 
-    focusTimerToggle.addEventListener('click', toggleFocusTimerVisibility);
+    focusTimerToggle.addEventListener('pointerdown', startFocusTimerToggleDrag);
+    focusTimerToggle.addEventListener('mousedown', startFocusTimerToggleMouseDrag);
+    window.addEventListener('pointermove', moveFocusTimerToggle);
+    window.addEventListener('pointerup', endFocusTimerToggleDrag);
+    window.addEventListener('pointercancel', endFocusTimerToggleDrag);
+    focusTimerToggle.addEventListener('click', () => {
+      if (focusToggleSuppressClick) return;
+      toggleFocusTimerVisibility();
+    });
+    window.addEventListener('resize', keepFocusTimerToggleInViewport);
     focusMaterialsButton.addEventListener('click', toggleFocusMaterialsView);
     focusPauseButton.addEventListener('click', toggleFocusPause);
     focusSkipRestButton.addEventListener('click', skipRest);
