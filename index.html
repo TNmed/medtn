@@ -1400,7 +1400,8 @@
     }
 
     .summary-browser,
-    .apg-browser {
+    .apg-browser,
+    .simulado-browser {
       position: relative;
       display: grid;
       gap: 18px;
@@ -1410,12 +1411,14 @@
     }
 
     .summary-browser::before,
-    .apg-browser::before {
+    .apg-browser::before,
+    .simulado-browser::before {
       display: none;
     }
 
     .summary-browser > *,
-    .apg-browser > * {
+    .apg-browser > *,
+    .simulado-browser > * {
       position: relative;
       z-index: 2;
     }
@@ -1433,13 +1436,16 @@
     .module-tabs,
     .discipline-tabs,
     .apg-period-tabs,
-    .apg-module-tabs {
+    .apg-module-tabs,
+    .simulado-period-tabs,
+    .simulado-module-tabs {
       display: grid;
       gap: 10px;
     }
 
     .period-tabs,
-    .apg-period-tabs {
+    .apg-period-tabs,
+    .simulado-period-tabs {
       grid-template-columns: repeat(8, minmax(112px, 1fr));
       padding: 8px;
       border: 0;
@@ -1453,7 +1459,9 @@
     .module-button,
     .discipline-button,
     .apg-period-button,
-    .apg-module-button {
+    .apg-module-button,
+    .simulado-period-button,
+    .simulado-module-button {
       position: relative;
       overflow: hidden;
       isolation: isolate;
@@ -1466,7 +1474,8 @@
     }
 
     .period-button,
-    .apg-period-button {
+    .apg-period-button,
+    .simulado-period-button {
       min-height: 50px;
       padding: 0 14px;
       border-radius: 18px;
@@ -1483,7 +1492,11 @@
     .apg-period-button:hover,
     .apg-period-button.active,
     .apg-module-button:hover,
-    .apg-module-button.active {
+    .apg-module-button.active,
+    .simulado-period-button:hover,
+    .simulado-period-button.active,
+    .simulado-module-button:hover,
+    .simulado-module-button.active {
       color: var(--azul-profundo);
       border-color: rgba(0, 213, 200, 0.34);
       background: linear-gradient(135deg, rgba(0, 109, 255, 0.12), rgba(0, 213, 200, 0.18));
@@ -1501,6 +1514,10 @@
     .apg-period-button.active::after,
     .apg-module-button.active::before,
     .apg-module-button.active::after,
+    .simulado-period-button.active::before,
+    .simulado-period-button.active::after,
+    .simulado-module-button.active::before,
+    .simulado-module-button.active::after,
     .tab-button.active::before,
     .tab-button.active::after {
       content: "";
@@ -1520,6 +1537,8 @@
     .discipline-button.active::before,
     .apg-period-button.active::before,
     .apg-module-button.active::before,
+    .simulado-period-button.active::before,
+    .simulado-module-button.active::before,
     .tab-button.active::before {
       inset: 10px 16px;
       border-color: rgba(0, 109, 255, 0.24);
@@ -1531,13 +1550,16 @@
     .module-button.active::before,
     .module-button.active::after,
     .apg-module-button.active::before,
-    .apg-module-button.active::after {
+    .apg-module-button.active::after,
+    .simulado-module-button.active::before,
+    .simulado-module-button.active::after {
       inset: 16px 20px;
       border-radius: 50%;
     }
 
     .module-button.active::before,
-    .apg-module-button.active::before {
+    .apg-module-button.active::before,
+    .simulado-module-button.active::before {
       inset: 22px 28px;
     }
 
@@ -1577,13 +1599,15 @@
     }
 
     .module-tabs,
-    .apg-module-tabs {
+    .apg-module-tabs,
+    .simulado-module-tabs {
       grid-template-columns: repeat(4, minmax(150px, 1fr));
       margin-top: 22px;
     }
 
     .module-button,
-    .apg-module-button {
+    .apg-module-button,
+    .simulado-module-button {
       min-height: 92px;
       padding: 18px;
       border-radius: 20px;
@@ -1591,7 +1615,8 @@
     }
 
     .module-button strong,
-    .apg-module-button strong {
+    .apg-module-button strong,
+    .simulado-module-button strong {
       display: block;
       color: var(--azul-profundo);
       font-size: 1.1rem;
@@ -1599,7 +1624,8 @@
     }
 
     .module-button span,
-    .apg-module-button span {
+    .apg-module-button span,
+    .simulado-module-button span {
       display: block;
       margin-top: 8px;
       color: var(--cinza-texto);
@@ -1628,7 +1654,8 @@
     }
 
     .summary-list,
-    .apg-topic-list {
+    .apg-topic-list,
+    .simulado-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
@@ -1742,6 +1769,14 @@
       border-radius: 16px;
       color: var(--cinza-texto);
       background: rgba(247, 251, 255, 0.76);
+    }
+
+    .simulado-card {
+      min-height: 210px;
+    }
+
+    .simulado-card .material-meta {
+      margin-top: 14px;
     }
 
     .roadmap {
@@ -1976,15 +2011,18 @@
       }
 
       .period-tabs,
-      .apg-period-tabs {
+      .apg-period-tabs,
+      .simulado-period-tabs {
         grid-template-columns: repeat(4, minmax(130px, 1fr));
       }
 
       .module-tabs,
       .apg-module-tabs,
+      .simulado-module-tabs,
       .discipline-tabs,
       .summary-list,
-      .apg-topic-list {
+      .apg-topic-list,
+      .simulado-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
@@ -2108,12 +2146,14 @@
       }
 
       .summary-browser,
-      .apg-browser {
+      .apg-browser,
+      .simulado-browser {
         padding: 0;
       }
 
       .period-tabs,
-      .apg-period-tabs {
+      .apg-period-tabs,
+      .simulado-period-tabs {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         overflow: visible;
         padding: 0;
@@ -2121,7 +2161,8 @@
       }
 
       .period-button,
-      .apg-period-button {
+      .apg-period-button,
+      .simulado-period-button {
         min-height: 48px;
         padding: 0 10px;
         border-radius: 16px;
@@ -2144,8 +2185,10 @@
 
       .module-tabs,
       .apg-module-tabs,
+      .simulado-module-tabs,
       .summary-list,
-      .apg-topic-list {
+      .apg-topic-list,
+      .simulado-list {
         grid-template-columns: 1fr;
       }
 
@@ -2293,12 +2336,14 @@
 
       .period-tabs,
       .apg-period-tabs,
+      .simulado-period-tabs,
       .discipline-tabs {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .period-button,
       .apg-period-button,
+      .simulado-period-button,
       .discipline-button {
         min-height: 40px;
         border-radius: 13px;
@@ -2306,19 +2351,22 @@
       }
 
       .module-button,
-      .apg-module-button {
+      .apg-module-button,
+      .simulado-module-button {
         min-height: 62px;
         padding: 12px;
         border-radius: 18px;
       }
 
       .module-button strong,
-      .apg-module-button strong {
+      .apg-module-button strong,
+      .simulado-module-button strong {
         font-size: 0.98rem;
       }
 
       .module-button span,
-      .apg-module-button span {
+      .apg-module-button span,
+      .simulado-module-button span {
         font-size: 0.76rem;
       }
 
@@ -2666,15 +2714,23 @@
                   <div class="summary-list" aria-live="polite">
                     <a class="summary-item" data-period="2" data-module="soi" data-discipline="anatomia" data-search="resumos segundo periodo soi 2 anatomia neuroanatomia parte 1 snc snp encefalo lobos cerebrais talamo hipotálamo cerebelo tronco medula meninges lcr nervos cranianos espinais plexos autonomo" href="TN%20medicina/anatomia/NEUROANATOMIA%20PARTE%201.pdf" target="_blank">
                       <span>
-                        <span class="summary-item-title">01 - NEUROANATOMIA PARTE 1</span>
+                        <span class="summary-item-title">NEUROANATOMIA PARTE 1</span>
                         <span class="summary-item-description">Apresenta a organização anatômica geral do sistema nervoso, incluindo SNC e SNP, encéfalo, cérebro, lobos cerebrais, diencéfalo, tálamo, hipotálamo, cerebelo, tronco encefálico, medula espinal, meninges, LCR, nervos cranianos, nervos espinais, plexos nervosos e sistema nervoso autônomo.</span>
+                      </span>
+                      <span class="summary-open">Abrir PDF →</span>
+                    </a>
+
+                    <a class="summary-item" data-period="2" data-module="soi" data-discipline="anatomia" data-search="resumos segundo periodo soi 2 anatomia neuroanatomia parte 2 sistema nervoso" href="TN%20medicina/anatomia/NEUROANATOMIA%20PARTE%202.pdf" target="_blank">
+                      <span>
+                        <span class="summary-item-title">NEUROANATOMIA PARTE 2</span>
+                        <span class="summary-item-description">Continuação do estudo de neuroanatomia em SOI II, aprofundando a organização anatômica do sistema nervoso para revisão e prova.</span>
                       </span>
                       <span class="summary-open">Abrir PDF →</span>
                     </a>
 
                     <a class="summary-item" data-period="2" data-module="soi" data-discipline="fisiologia" data-search="resumos segundo periodo soi 2 fisiologia neurofisiologia parte 1 comunicação neural neuronio dendritos axonio mielina potencial de acao sinapses neurotransmissores receptores integração sinaptica" href="TN%20medicina/fisiologia/NEUROFISIOLOGIA%20PARTE1.pdf" target="_blank">
                       <span>
-                        <span class="summary-item-title">02 - NEUROFISIOLOGIA PARTE 1</span>
+                        <span class="summary-item-title">NEUROFISIOLOGIA PARTE 1</span>
                         <span class="summary-item-description">Aborda a base da comunicação neural, explicando neurônio, dendritos, axônio, mielina, potencial de ação, fases elétricas da membrana, potenciais graduados, sinapses químicas/elétricas, neurotransmissores, receptores ionotrópicos/metabotrópicos e integração sináptica.</span>
                       </span>
                       <span class="summary-open">Abrir PDF →</span>
@@ -2682,7 +2738,7 @@
 
                     <a class="summary-item" data-period="2" data-module="soi" data-discipline="fisiologia" data-search="resumos segundo periodo soi 2 fisiologia neurofisiologia parte 2 barreira hematoencefalica liquor lcr bhe hematoliquorica produção composição trajeto absorção funções" href="TN%20medicina/fisiologia/NEUROFISIOLOGIA%20PARTE%202.pdf" target="_blank">
                       <span>
-                        <span class="summary-item-title">03 - NEUROFISIOLOGIA PARTE 2</span>
+                        <span class="summary-item-title">NEUROFISIOLOGIA PARTE 2</span>
                         <span class="summary-item-description">Trata da barreira hematoencefálica e do líquor, explicando por que o SNC precisa de barreiras, como substâncias entram no encéfalo, o papel da BHE e da barreira hematoliquórica, produção, composição, trajeto, absorção e funções do LCR.</span>
                       </span>
                       <span class="summary-open">Abrir PDF →</span>
@@ -2690,7 +2746,7 @@
 
                     <a class="summary-item" data-period="2" data-module="soi" data-discipline="fisiologia" data-search="resumos segundo periodo soi 2 fisiologia neurofisiologia parte 3 somatossensorial dor reflexos sensibilidade receptores nocicepcao fibras vias sensitivas lemnisco espinotalamico córtex limbico arco reflexo" href="TN%20medicina/fisiologia/NEUROFISIOLOGIA%20PARTE%203.pdf" target="_blank">
                       <span>
-                        <span class="summary-item-title">04 - NEUROFISIOLOGIA PARTE 3</span>
+                        <span class="summary-item-title">NEUROFISIOLOGIA PARTE 3</span>
                         <span class="summary-item-description">Foca no sistema somatossensorial, dor e reflexos, abordando sensibilidade somática e visceral, receptores sensoriais, nocicepção, fibras Aδ e C, vias sensitivas, coluna dorsal–lemnisco medial, trato espinotalâmico, modulação da dor, córtex somatossensorial, sistema límbico e arco reflexo.</span>
                       </span>
                       <span class="summary-open">Abrir PDF →</span>
@@ -2815,29 +2871,65 @@
     </section>
 
     <section id="simulados">
-      <div class="page-shell roadmap">
-        <div class="roadmap-card reveal">
-          <h3>Simulados para transformar revisão passiva em estudo ativo.</h3>
-          <p>
-            Essa área pode receber provas completas, listas por tema e gabaritos separados. A ideia é treinar interpretação fina, raciocínio integrado e pegadinhas comuns da faculdade.
-          </p>
+      <div class="page-shell">
+        <div class="section-header reveal">
+          <span class="eyebrow">Simulados</span>
+          <h2 class="section-title">Simulados por período e módulo.</h2>
         </div>
 
-        <div class="roadmap-list">
-          <article class="roadmap-item reveal">
-            <div class="roadmap-number">1</div>
+        <div class="materials-panel reveal">
+          <div class="simulado-browser" data-active-period="2" data-active-module="soi">
             <div>
-              <h4>Prova em PDF</h4>
-              <p>Adicione o arquivo da prova em <strong>pdfs/simulados/</strong> e atualize o link no card correspondente.</p>
+              <div class="summary-label">Períodos</div>
+              <div class="simulado-period-tabs" role="tablist" aria-label="Escolha o período de simulados">
+                <button class="simulado-period-button" data-simulado-period="1" type="button">1º período</button>
+                <button class="simulado-period-button active" data-simulado-period="2" type="button">2º período</button>
+                <button class="simulado-period-button" data-simulado-period="3" type="button">3º período</button>
+                <button class="simulado-period-button" data-simulado-period="4" type="button">4º período</button>
+                <button class="simulado-period-button" data-simulado-period="5" type="button">5º período</button>
+                <button class="simulado-period-button" data-simulado-period="6" type="button">6º período</button>
+                <button class="simulado-period-button" data-simulado-period="7" type="button">7º período</button>
+                <button class="simulado-period-button" data-simulado-period="8" type="button">8º período</button>
+              </div>
             </div>
-          </article>
-          <article class="roadmap-item reveal">
-            <div class="roadmap-number">2</div>
-            <div>
-              <h4>Gabarito separado</h4>
-              <p>Você pode criar outro card apenas para gabaritos, deixando prova e resposta em arquivos diferentes.</p>
+
+            <div class="summary-panel">
+              <div class="summary-panel-header">
+                <div>
+                  <div class="summary-panel-kicker">Período selecionado</div>
+                  <h3 class="summary-panel-title" id="simuladoSelectedPeriodTitle">2º período</h3>
+                </div>
+                <div class="summary-trail" id="simuladoTrail">Simulados → 2º período → SOI II</div>
+              </div>
+
+              <div class="summary-module-card">
+                <div class="summary-panel-kicker">Módulos</div>
+                <div class="simulado-module-tabs" role="tablist" aria-label="Escolha o módulo de simulados">
+                  <button class="simulado-module-button active" data-simulado-module="soi" type="button">
+                    <strong>SOI II</strong>
+                    <span>Selecionado</span>
+                  </button>
+                  <button class="simulado-module-button" data-simulado-module="ham" type="button">
+                    <strong>HAM II</strong>
+                    <span>Clique para visualizar</span>
+                  </button>
+                  <button class="simulado-module-button" data-simulado-module="iesc" type="button">
+                    <strong>IESC II</strong>
+                    <span>Clique para visualizar</span>
+                  </button>
+                  <button class="simulado-module-button" data-simulado-module="mcm" type="button">
+                    <strong>MCM II</strong>
+                    <span>Clique para visualizar</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="summary-module-card">
+                <div class="summary-panel-kicker">Simulados disponíveis</div>
+                <div class="simulado-list" id="simuladoList" aria-live="polite"></div>
+              </div>
             </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>
@@ -3024,6 +3116,12 @@
     const apgTopicList = document.querySelector('#apgTopicList');
     const apgEmpty = document.querySelector('#apgEmpty');
     const apgSelectedPeriodTitle = document.querySelector('#apgSelectedPeriodTitle');
+    const simuladoBrowser = document.querySelector('.simulado-browser');
+    const simuladoPeriodButtons = document.querySelectorAll('.simulado-period-button');
+    const simuladoModuleButtons = document.querySelectorAll('.simulado-module-button');
+    const simuladoList = document.querySelector('#simuladoList');
+    const simuladoSelectedPeriodTitle = document.querySelector('#simuladoSelectedPeriodTitle');
+    const simuladoTrail = document.querySelector('#simuladoTrail');
     const navLinks = document.querySelectorAll('.nav-links a');
     const sections = document.querySelectorAll('section[id]');
     let navActiveLock = null;
@@ -3086,6 +3184,30 @@
       6: 'VI',
       7: 'VII',
       8: 'VIII',
+    };
+    const simuladoDescriptions = {
+      soi: 'Simulado integrado com questões do módulo SOI, reunindo os conteúdos do período em uma revisão única.',
+      ham: 'Simulado de habilidades médicas com foco em raciocínio clínico, prática, semiologia e comunicação.',
+      iesc: 'Simulado de IESC com questões sobre SUS, APS, território, vigilância e organização do cuidado.',
+      mcm: 'Simulado de MCM para treinar epidemiologia, metodologia científica, bioestatística e leitura crítica.',
+    };
+    const simuladoFiles = {
+      2: {
+        soi: [
+          {
+            title: 'SIMULADO FISIO PARTE 1-3',
+            description: 'Simulado de fisiologia em SOI II, reunindo questões das partes 1 a 3 para treino ativo.',
+            type: 'Simulado',
+            href: 'TN%20medicina/simulados/SOI%20II/SIMULADO%20FISIO%20PARTE%201-3.pdf',
+          },
+          {
+            title: 'GABARITO FISIO PARTE 1-3',
+            description: 'Gabarito do simulado de fisiologia das partes 1 a 3, organizado para conferência após a resolução.',
+            type: 'Gabarito',
+            href: 'TN%20medicina/simulados/SOI%20II/GABARITO%20FISIO%20PARTE%201-3.pdf',
+          },
+        ],
+      },
     };
     const apgTopics = {
       2: {
@@ -3377,6 +3499,96 @@
           ? 'Nenhum tema de APG encontrado nesse período e módulo com o termo pesquisado.'
           : 'Ainda não há temas cadastrados para este período e módulo.';
       }
+    }
+
+    function renderSimuladoBrowser() {
+      if (!simuladoBrowser || !simuladoList) return;
+
+      const activePeriod = simuladoBrowser.dataset.activePeriod || '2';
+      const activeModule = simuladoBrowser.dataset.activeModule || 'soi';
+      const moduleName = moduleNames[activeModule] || activeModule.toUpperCase();
+      const modulePeriod = periodRoman[activePeriod] || activePeriod;
+      const description = simuladoDescriptions[activeModule] || 'Simulado integrado do módulo selecionado.';
+
+      simuladoPeriodButtons.forEach((button) => {
+        const isActive = button.dataset.simuladoPeriod === activePeriod;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
+
+      simuladoModuleButtons.forEach((button) => {
+        const isActive = button.dataset.simuladoModule === activeModule;
+        const label = moduleNames[button.dataset.simuladoModule] || button.dataset.simuladoModule.toUpperCase();
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+        button.querySelector('strong').textContent = `${label} ${modulePeriod}`;
+        button.querySelector('span').textContent = isActive ? 'Selecionado' : 'Clique para visualizar';
+      });
+
+      simuladoSelectedPeriodTitle.textContent = `${activePeriod}º período`;
+      simuladoTrail.textContent = `Simulados → ${activePeriod}º período → ${moduleName} ${modulePeriod}`;
+      simuladoList.innerHTML = '';
+      const files = (simuladoFiles[activePeriod] && simuladoFiles[activePeriod][activeModule]) || [];
+      const cards = files.length > 0
+        ? files
+        : [{
+            title: `Simulado ${moduleName} ${modulePeriod}`,
+            description,
+            type: 'Treino',
+            href: null,
+          }];
+
+      cards.forEach((cardData) => {
+        const card = document.createElement('article');
+        card.className = 'material-card simulado-card';
+        card.dataset.search = `simulado ${moduleName} ${modulePeriod} ${activePeriod} periodo ${cardData.title}`;
+
+        const content = document.createElement('div');
+        const title = document.createElement('h3');
+        title.textContent = cardData.title;
+
+        const paragraph = document.createElement('p');
+        paragraph.textContent = cardData.description;
+
+        const meta = document.createElement('div');
+        meta.className = 'material-meta';
+
+        const moduleChip = document.createElement('span');
+        moduleChip.className = 'chip';
+        moduleChip.textContent = `${moduleName} ${modulePeriod}`;
+
+        const periodChip = document.createElement('span');
+        periodChip.className = 'chip';
+        periodChip.textContent = `${activePeriod}º período`;
+
+        const typeChip = document.createElement('span');
+        typeChip.className = 'chip';
+        typeChip.textContent = cardData.type;
+
+        meta.append(moduleChip, periodChip, typeChip);
+        content.append(title, paragraph, meta);
+
+        const actions = document.createElement('div');
+        actions.className = 'material-actions';
+
+        const level = document.createElement('span');
+        level.className = 'level';
+        level.textContent = cardData.type;
+
+        const action = cardData.href ? document.createElement('a') : document.createElement('span');
+        action.className = cardData.href ? 'material-link' : 'material-link unavailable';
+        action.textContent = cardData.href ? 'Abrir PDF →' : 'Em breve';
+        if (cardData.href) {
+          action.href = cardData.href;
+          action.target = '_blank';
+        }
+
+        actions.append(level, action);
+        card.append(content, actions);
+        simuladoList.appendChild(card);
+      });
+
+      preparePDFLinks();
     }
 
     function formatFocusTime(totalSeconds) {
@@ -3966,6 +4178,20 @@
       });
     });
 
+    simuladoPeriodButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        simuladoBrowser.dataset.activePeriod = button.dataset.simuladoPeriod;
+        renderSimuladoBrowser();
+      });
+    });
+
+    simuladoModuleButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        simuladoBrowser.dataset.activeModule = button.dataset.simuladoModule;
+        renderSimuladoBrowser();
+      });
+    });
+
     document.querySelectorAll('[data-material-tab]').forEach((link) => {
       link.addEventListener('click', (event) => {
         event.preventDefault();
@@ -3994,6 +4220,7 @@
     searchInput.addEventListener('input', filterCards);
     renderSummaryBrowser();
     renderAPGBrowser();
+    renderSimuladoBrowser();
     preparePDFLinks();
     restoreFocusMode();
 
