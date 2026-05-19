@@ -150,7 +150,11 @@
     }
 
     .nav-links a {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
       padding: 9px 14px;
+      border: 1px solid transparent;
       border-radius: 999px;
       color: var(--cinza-texto);
       font-size: 0.88rem;
@@ -165,6 +169,19 @@
     .nav-links a.active {
       color: var(--azul-navy);
       background: linear-gradient(135deg, rgba(0, 109, 255, 0.10), rgba(0, 213, 200, 0.14));
+    }
+
+    .nav-links a.focus-nav-link {
+      color: var(--azul-vivo);
+      font-weight: 900;
+    }
+
+    .nav-links a.focus-nav-link:hover {
+      color: var(--azul-navy);
+    }
+
+    .nav-links a.focus-nav-link.active {
+      color: var(--azul-navy);
     }
 
     .hero {
@@ -2463,9 +2480,9 @@
 
       <nav class="nav-links" aria-label="Navegação principal">
         <a href="#sobre" class="active">Sobre</a>
-        <a href="#resumos">Resumos</a>
+        <a href="#resumos" data-material-tab="resumos">Resumos</a>
         <a href="#simulados">Simulados</a>
-        <a href="#modo-foco">Modo foco</a>
+        <a href="#modo-foco" class="focus-nav-link">Modo foco</a>
         <a href="#resumos" data-material-tab="apg">APG</a>
       </nav>
     </div>
@@ -3007,6 +3024,10 @@
     const apgTopicList = document.querySelector('#apgTopicList');
     const apgEmpty = document.querySelector('#apgEmpty');
     const apgSelectedPeriodTitle = document.querySelector('#apgSelectedPeriodTitle');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = document.querySelectorAll('section[id]');
+    let navActiveLock = null;
+    let navActiveLockTimer = null;
     const apgTrail = document.querySelector('#apgTrail');
     const apgTopicKicker = document.querySelector('#apgTopicKicker');
     const focusStartButtons = document.querySelectorAll('.focus-start');
@@ -3041,6 +3062,7 @@
     let focusTogglePointer = null;
     let focusToggleMoved = false;
     let focusToggleSuppressClick = false;
+    let focusAudioContext = null;
     const focusStorageKey = 'tnmed.focus.state.v1';
     const moduleNames = {
       soi: 'SOI',
@@ -3178,6 +3200,46 @@
         .replace(/[\u0300-\u036f]/g, '');
     }
 
+    function getActiveMaterialTab() {
+      return document.querySelector('.tab-button.active')?.dataset.tab || 'resumos';
+    }
+
+    function syncNavActive(sectionId) {
+      const currentSectionId = navActiveLock || sectionId;
+      const activeMaterialTab = getActiveMaterialTab();
+
+      navLinks.forEach((link) => {
+        const materialTab = link.dataset.materialTab;
+        let isActive = false;
+
+        if (currentSectionId === 'resumos') {
+          isActive = materialTab ? materialTab === activeMaterialTab : link.getAttribute('href') === '#resumos';
+        } else if (currentSectionId === 'apg') {
+          isActive = materialTab === 'apg';
+        } else {
+          isActive = !materialTab && link.getAttribute('href') === `#${currentSectionId}`;
+        }
+
+        link.classList.toggle('active', isActive);
+      });
+    }
+
+    function clearNavActiveLock() {
+      window.clearTimeout(navActiveLockTimer);
+      navActiveLockTimer = null;
+      navActiveLock = null;
+    }
+
+    function lockNavActive(sectionId) {
+      navActiveLock = sectionId;
+      syncNavActive(sectionId);
+      window.clearTimeout(navActiveLockTimer);
+      navActiveLockTimer = window.setTimeout(() => {
+        clearNavActiveLock();
+        updateScrollEffects();
+      }, 3600);
+    }
+
     function activateTab(tabId) {
       tabButtons.forEach((button) => {
         button.classList.toggle('active', button.dataset.tab === tabId);
@@ -3188,6 +3250,7 @@
       });
 
       filterCards();
+      syncNavActive('resumos');
     }
 
     function renderSummaryBrowser() {
@@ -3322,6 +3385,65 @@
       return `${minutes}:${seconds}`;
     }
 
+    function getFocusAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      if (!focusAudioContext) {
+        focusAudioContext = new AudioContextClass();
+      }
+      return focusAudioContext;
+    }
+
+    function unlockFocusAudio() {
+      const context = getFocusAudioContext();
+      if (context && context.state === 'suspended') {
+        context.resume().catch(() => {});
+      }
+    }
+
+    function playFocusCycleSound() {
+      const context = getFocusAudioContext();
+      if (!context) return;
+
+      if (context.state === 'suspended') {
+        context.resume()
+          .then(playFocusCycleSound)
+          .catch(() => {});
+        return;
+      }
+
+      const now = context.currentTime + 0.03;
+      const master = context.createGain();
+      const notes = [
+        { frequency: 659.25, start: 0, duration: 0.16 },
+        { frequency: 783.99, start: 0.18, duration: 0.18 },
+        { frequency: 987.77, start: 0.39, duration: 0.32 },
+      ];
+
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.16, now + 0.04);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.02);
+      master.connect(context.destination);
+
+      notes.forEach((note) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        const startsAt = now + note.start;
+        const endsAt = startsAt + note.duration;
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(note.frequency, startsAt);
+        gain.gain.setValueAtTime(0.0001, startsAt);
+        gain.gain.exponentialRampToValueAtTime(0.9, startsAt + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, endsAt);
+
+        oscillator.connect(gain);
+        gain.connect(master);
+        oscillator.start(startsAt);
+        oscillator.stop(endsAt + 0.05);
+      });
+    }
+
     function saveFocusState() {
       try {
         if (focusState.active) {
@@ -3400,6 +3522,7 @@
 
     function showFocusTransition(transition) {
       if (transition === 'focus-complete') {
+        playFocusCycleSound();
         showFocusAlert(
           'Parabéns Dr.(a) você conseguiu! Até a próxima',
           `Ciclo concluído. Agora começa um descanso de ${Math.round(focusState.restSeconds / 60)} min. Você pode continuar no método ou encerrar o modo foco.`
@@ -3613,6 +3736,7 @@
       const focusMinutes = Number(card.dataset.focusMinutes || 25);
       const restMinutes = Number(card.dataset.restMinutes || 5);
 
+      unlockFocusAudio();
       window.clearInterval(focusInterval);
       document.body.classList.remove('focus-cleanup');
       focusState = {
@@ -3787,8 +3911,14 @@
     });
     window.addEventListener('resize', keepFocusTimerToggleInViewport);
     focusMaterialsButton.addEventListener('click', toggleFocusMaterialsView);
-    focusPauseButton.addEventListener('click', toggleFocusPause);
-    focusSkipRestButton.addEventListener('click', skipRest);
+    focusPauseButton.addEventListener('click', () => {
+      unlockFocusAudio();
+      toggleFocusPause();
+    });
+    focusSkipRestButton.addEventListener('click', () => {
+      unlockFocusAudio();
+      skipRest();
+    });
     focusEndButton.addEventListener('click', endFocusMode);
     focusContinueButton.addEventListener('click', hideFocusAlert);
     focusAlertEndButton.addEventListener('click', endFocusMode);
@@ -3840,7 +3970,24 @@
       link.addEventListener('click', (event) => {
         event.preventDefault();
         activateTab(link.dataset.materialTab);
+        lockNavActive('resumos');
         document.querySelector('#resumos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    navLinks.forEach((link) => {
+      if (link.dataset.materialTab) return;
+
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+
+      link.addEventListener('click', (event) => {
+        const target = document.querySelector(href);
+        if (!target) return;
+
+        event.preventDefault();
+        lockNavActive(href.slice(1));
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
 
@@ -3860,9 +4007,6 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
-
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const sections = document.querySelectorAll('section[id]');
 
     function updateAmbientElectrosphere() {
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
@@ -3886,15 +4030,24 @@
       const currentPosition = window.scrollY + 120;
       updateAmbientElectrosphere();
 
+      if (navActiveLock) {
+        const lockedSection = document.getElementById(navActiveLock);
+        if (lockedSection) {
+          const lockedTop = lockedSection.offsetTop;
+          const lockedBottom = lockedTop + lockedSection.offsetHeight;
+          if (currentPosition >= lockedTop && currentPosition < lockedBottom) {
+            clearNavActiveLock();
+          }
+        }
+      }
+
       sections.forEach((section) => {
         const sectionTop = section.offsetTop;
         const sectionBottom = sectionTop + section.offsetHeight;
         const sectionId = section.getAttribute('id');
 
         if (currentPosition >= sectionTop && currentPosition < sectionBottom) {
-          navLinks.forEach((link) => {
-            link.classList.toggle('active', link.getAttribute('href') === `#${sectionId}`);
-          });
+          syncNavActive(sectionId);
         }
       });
     }
