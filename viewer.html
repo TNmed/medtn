@@ -8,6 +8,7 @@
   <link rel="shortcut icon" type="image/png" href="assets/logo-tn.png" />
   <link rel="apple-touch-icon" href="assets/logo-tn.png" />
   <meta name="theme-color" content="#006dff" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta property="og:title" content="Túlyo Neves | Materiais Medicina" />
   <meta property="og:description" content="Leitor interno de materiais acadêmicos de Medicina." />
   <meta property="og:image" content="assets/logo-tn.png" />
@@ -44,6 +45,15 @@
         linear-gradient(180deg, #f8fcff 0%, #eef8ff 52%, #ffffff 100%);
       overflow-x: hidden;
       transition: background 0.55s ease, color 0.55s ease;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    input,
+    textarea,
+    iframe {
+      -webkit-user-select: auto;
+      user-select: auto;
     }
 
     body.focus-reader {
@@ -348,6 +358,32 @@
       line-height: 1.6;
     }
 
+    .copy-guard-toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10000;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 13px 16px;
+      border: 1px solid rgba(0, 213, 200, 0.30);
+      border-radius: 16px;
+      color: var(--branco);
+      background: rgba(2, 11, 47, 0.92);
+      box-shadow: 0 20px 54px rgba(0, 43, 138, 0.28);
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.35;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .copy-guard-toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     @media (max-width: 720px) {
       .navbar-inner {
         align-items: flex-start;
@@ -421,6 +457,10 @@
   </style>
 </head>
 <body>
+  <div class="copy-guard-toast" id="copyGuardToast" role="status" aria-live="polite">
+    Proteção acadêmica ativa. Cópia direta bloqueada.
+  </div>
+
   <header class="navbar">
     <div class="shell navbar-inner">
       <a class="brand" href="index.html#resumos" id="brandHome" aria-label="Voltar para os materiais">
@@ -508,9 +548,65 @@
     const focusReaderPhase = document.querySelector('#focusReaderPhase');
     const focusReaderCycles = document.querySelector('#focusReaderCycles');
     const focusReaderEndButton = document.querySelector('#focusReaderEndButton');
+    const copyGuardToast = document.querySelector('#copyGuardToast');
     const focusStorageKey = 'tnmed.focus.state.v1';
     let focusReaderInterval = null;
     let focusState = null;
+    let copyGuardTimer = null;
+
+    function showCopyGuard(message = 'Proteção acadêmica ativa. Cópia direta bloqueada.') {
+      if (!copyGuardToast) return;
+      copyGuardToast.textContent = message;
+      copyGuardToast.classList.add('visible');
+      window.clearTimeout(copyGuardTimer);
+      copyGuardTimer = window.setTimeout(() => {
+        copyGuardToast.classList.remove('visible');
+      }, 2400);
+    }
+
+    function isEditableTarget(target) {
+      return target instanceof HTMLElement && Boolean(target.closest('input, textarea, [contenteditable="true"]'));
+    }
+
+    function setupCopyGuard() {
+      document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        showCopyGuard('Botão direito bloqueado para proteger os materiais.');
+      });
+
+      document.addEventListener('copy', (event) => {
+        if (isEditableTarget(event.target)) return;
+        event.preventDefault();
+        showCopyGuard('Cópia direta bloqueada para proteger os materiais.');
+      });
+
+      document.addEventListener('cut', (event) => {
+        if (isEditableTarget(event.target)) return;
+        event.preventDefault();
+        showCopyGuard('Corte de conteúdo bloqueado.');
+      });
+
+      document.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+        showCopyGuard('Arrastar conteúdo foi bloqueado.');
+      });
+
+      document.addEventListener('keydown', (event) => {
+        const key = event.key.toLowerCase();
+        const withControl = event.ctrlKey || event.metaKey;
+        const developerShortcut = key === 'f12' || (withControl && event.shiftKey && ['i', 'j', 'c', 'k'].includes(key));
+        const browserShortcut = withControl && ['u', 's', 'p'].includes(key);
+        const contentShortcut = withControl && ['c', 'x', 'a'].includes(key) && !isEditableTarget(event.target);
+
+        if (developerShortcut || browserShortcut || contentShortcut) {
+          event.preventDefault();
+          event.stopPropagation();
+          showCopyGuard('Atalho bloqueado para reduzir cópia do site.');
+        }
+      }, true);
+    }
+
+    setupCopyGuard();
 
     function safeFilePath(value) {
       const trimmed = value.trim();

@@ -8,6 +8,7 @@
   <link rel="shortcut icon" type="image/png" href="assets/logo-tn.png" />
   <link rel="apple-touch-icon" href="assets/logo-tn.png" />
   <meta name="theme-color" content="#006dff" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta property="og:title" content="Túlyo Neves | Materiais Medicina" />
   <meta property="og:description" content="Materiais de Medicina com organização e direção para prova." />
   <meta property="og:image" content="assets/logo-tn.png" />
@@ -54,6 +55,15 @@
         linear-gradient(180deg, #f8fcff 0%, #eef8ff 46%, #ffffff 100%);
       overflow-x: hidden;
       transition: background 0.7s ease, color 0.7s ease;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    input,
+    textarea,
+    iframe {
+      -webkit-user-select: auto;
+      user-select: auto;
     }
 
     body::before {
@@ -1605,6 +1615,10 @@
       margin-top: 22px;
     }
 
+    .simulado-module-tabs {
+      grid-template-columns: repeat(5, minmax(136px, 1fr));
+    }
+
     .module-button,
     .apg-module-button,
     .simulado-module-button {
@@ -1889,6 +1903,33 @@
       margin-top: 6px;
       color: var(--cinza-texto);
       font-size: 0.9rem;
+    }
+
+    .copy-guard-toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10000;
+      max-width: min(340px, calc(100vw - 28px));
+      padding: 13px 16px;
+      border: 1px solid rgba(0, 213, 200, 0.28);
+      border-radius: 18px;
+      color: var(--branco);
+      background: rgba(2, 11, 47, 0.92);
+      box-shadow: 0 20px 50px rgba(0, 43, 138, 0.22);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(14px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      font-size: 0.85rem;
+      font-weight: 800;
+      line-height: 1.45;
+      backdrop-filter: blur(14px);
+    }
+
+    .copy-guard-toast.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .reveal {
@@ -2512,6 +2553,10 @@
 </style>
 </head>
 <body>
+  <div class="copy-guard-toast" id="copyGuardToast" role="status" aria-live="polite">
+    Proteção acadêmica ativa. Cópia direta bloqueada.
+  </div>
+
   <div class="ambient-electrosphere" aria-hidden="true">
     <span class="energy-orbit orbit-a"></span>
     <span class="energy-orbit orbit-b"></span>
@@ -2727,6 +2772,14 @@
                       <span class="summary-open">Abrir PDF →</span>
                     </a>
 
+                    <a class="summary-item" data-period="2" data-module="soi" data-discipline="anatomia" data-search="resumos segundo periodo soi 2 anatomia neuroanatomia parte 3 sistema nervoso neuroanatomia revisão prova" href="TN%20medicina/anatomia/NEUROANATOMIA%20PARTE%203.pdf" target="_blank">
+                      <span>
+                        <span class="summary-item-title">NEUROANATOMIA PARTE 3</span>
+                        <span class="summary-item-description">Aprofunda o estudo de neuroanatomia em SOI II, continuando a organização anatômica do sistema nervoso para revisão estruturada e preparação para prova.</span>
+                      </span>
+                      <span class="summary-open">Abrir PDF →</span>
+                    </a>
+
                     <a class="summary-item" data-period="2" data-module="soi" data-discipline="fisiologia" data-search="resumos segundo periodo soi 2 fisiologia neurofisiologia parte 1 comunicação neural neuronio dendritos axonio mielina potencial de acao sinapses neurotransmissores receptores integração sinaptica" href="TN%20medicina/fisiologia/NEUROFISIOLOGIA%20PARTE1.pdf" target="_blank">
                       <span>
                         <span class="summary-item-title">NEUROFISIOLOGIA PARTE 1</span>
@@ -2747,6 +2800,14 @@
                       <span>
                         <span class="summary-item-title">NEUROFISIOLOGIA PARTE 3</span>
                         <span class="summary-item-description">Foca no sistema somatossensorial, dor e reflexos, abordando sensibilidade somática e visceral, receptores sensoriais, nocicepção, fibras Aδ e C, vias sensitivas, coluna dorsal–lemnisco medial, trato espinotalâmico, modulação da dor, córtex somatossensorial, sistema límbico e arco reflexo.</span>
+                      </span>
+                      <span class="summary-open">Abrir PDF →</span>
+                    </a>
+
+                    <a class="summary-item" data-period="2" data-module="soi" data-discipline="embriologia" data-search="resumos segundo periodo soi 2 embriologia parte 1 desenvolvimento embrionario revisão prova" href="TN%20medicina/embriologia/EMBRIOLOGIA%20PARTE%201.pdf" target="_blank">
+                      <span>
+                        <span class="summary-item-title">EMBRIOLOGIA PARTE 1</span>
+                        <span class="summary-item-description">Introduz os principais conceitos de embriologia em SOI II, organizando a base do desenvolvimento embrionário para estudo, revisão e preparação para prova.</span>
                       </span>
                       <span class="summary-open">Abrir PDF →</span>
                     </a>
@@ -2828,7 +2889,7 @@
         </div>
 
         <div class="materials-panel reveal">
-          <div class="simulado-browser" data-active-period="2" data-active-module="soi">
+          <div class="simulado-browser" data-active-period="2" data-active-module="integradora">
             <div>
               <div class="summary-label">Períodos</div>
               <div class="simulado-period-tabs" role="tablist" aria-label="Escolha o período de simulados">
@@ -2849,15 +2910,19 @@
                   <div class="summary-panel-kicker">Período selecionado</div>
                   <h3 class="summary-panel-title" id="simuladoSelectedPeriodTitle">2º período</h3>
                 </div>
-                <div class="summary-trail" id="simuladoTrail">Simulados → 2º período → SOI II</div>
+                <div class="summary-trail" id="simuladoTrail">Simulados → 2º período → INTEGRADORA II</div>
               </div>
 
               <div class="summary-module-card">
                 <div class="summary-panel-kicker">Módulos</div>
                 <div class="simulado-module-tabs" role="tablist" aria-label="Escolha o módulo de simulados">
-                  <button class="simulado-module-button active" data-simulado-module="soi" type="button">
-                    <strong>SOI II</strong>
+                  <button class="simulado-module-button active" data-simulado-module="integradora" type="button">
+                    <strong>INTEGRADORA II</strong>
                     <span>Selecionado</span>
+                  </button>
+                  <button class="simulado-module-button" data-simulado-module="soi" type="button">
+                    <strong>SOI II</strong>
+                    <span>Clique para visualizar</span>
                   </button>
                   <button class="simulado-module-button" data-simulado-module="ham" type="button">
                     <strong>HAM II</strong>
@@ -3094,6 +3159,7 @@
     const focusAlertText = document.querySelector('#focusAlertText');
     const focusContinueButton = document.querySelector('#focusContinueButton');
     const focusAlertEndButton = document.querySelector('#focusAlertEndButton');
+    const copyGuardToast = document.querySelector('#copyGuardToast');
     let focusInterval = null;
     let focusState = {
       active: false,
@@ -3113,6 +3179,7 @@
     let focusAudioContext = null;
     const focusStorageKey = 'tnmed.focus.state.v1';
     const moduleNames = {
+      integradora: 'INTEGRADORA',
       soi: 'SOI',
       ham: 'HAM',
       iesc: 'IESC',
@@ -3125,6 +3192,63 @@
       embriologia: 'Embriologia',
       histologia: 'Histologia',
     };
+
+    let copyGuardTimer = null;
+
+    function showCopyGuard(message = 'Proteção acadêmica ativa. Cópia direta bloqueada.') {
+      if (!copyGuardToast) return;
+      copyGuardToast.textContent = message;
+      copyGuardToast.classList.add('visible');
+      window.clearTimeout(copyGuardTimer);
+      copyGuardTimer = window.setTimeout(() => {
+        copyGuardToast.classList.remove('visible');
+      }, 2400);
+    }
+
+    function isEditableTarget(target) {
+      return target instanceof HTMLElement && Boolean(target.closest('input, textarea, [contenteditable="true"]'));
+    }
+
+    function setupCopyGuard() {
+      document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        showCopyGuard('Botão direito bloqueado para proteger os materiais.');
+      });
+
+      document.addEventListener('copy', (event) => {
+        if (isEditableTarget(event.target)) return;
+        event.preventDefault();
+        showCopyGuard('Cópia direta bloqueada para proteger os materiais.');
+      });
+
+      document.addEventListener('cut', (event) => {
+        if (isEditableTarget(event.target)) return;
+        event.preventDefault();
+        showCopyGuard('Corte de conteúdo bloqueado.');
+      });
+
+      document.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+        showCopyGuard('Arrastar conteúdo foi bloqueado.');
+      });
+
+      document.addEventListener('keydown', (event) => {
+        const key = event.key.toLowerCase();
+        const withControl = event.ctrlKey || event.metaKey;
+        const developerShortcut = key === 'f12' || (withControl && event.shiftKey && ['i', 'j', 'c', 'k'].includes(key));
+        const browserShortcut = withControl && ['u', 's', 'p'].includes(key);
+        const contentShortcut = withControl && ['c', 'x', 'a'].includes(key) && !isEditableTarget(event.target);
+
+        if (developerShortcut || browserShortcut || contentShortcut) {
+          event.preventDefault();
+          event.stopPropagation();
+          showCopyGuard('Atalho bloqueado para reduzir cópia do site.');
+        }
+      }, true);
+    }
+
+    setupCopyGuard();
+
     const periodRoman = {
       1: 'I',
       2: 'II',
@@ -3136,6 +3260,7 @@
       8: 'VIII',
     };
     const simuladoDescriptions = {
+      integradora: 'Simulado integrador com questões que atravessam SOI, HAM, IESC e MCM, pensado para treinar a prova como um todo.',
       soi: 'Simulado integrado com questões do módulo SOI, reunindo os conteúdos do período em uma revisão única.',
       ham: 'Simulado de habilidades médicas com foco em raciocínio clínico, prática, semiologia e comunicação.',
       iesc: 'Simulado de IESC com questões sobre SUS, APS, território, vigilância e organização do cuidado.',
@@ -3143,6 +3268,44 @@
     };
     const simuladoFiles = {
       2: {
+        integradora: [
+          {
+            title: 'PRIMEIRO SIMULADO INTEGRADORA SOI II',
+            description: 'Primeiro simulado integrador de SOI II, reunindo temas de todos os módulos para treino de prova.',
+            type: 'Simulado',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/PRIMEIRO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+          {
+            title: 'GABARITO PRIMEIRO SIMULADO INTEGRADORA SOI II',
+            description: 'Gabarito do primeiro simulado integrador de SOI II para conferência e revisão direcionada.',
+            type: 'Gabarito',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/GABARITO%20PRIMEIRO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+          {
+            title: 'SEGUNDO SIMULADO INTEGRADORA SOI II',
+            description: 'Segundo simulado integrador de SOI II para consolidar conteúdos e treinar raciocínio interdisciplinar.',
+            type: 'Simulado',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/SEGUNDO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+          {
+            title: 'GABARITO SEGUNDO SIMULADO INTEGRADORA SOI II',
+            description: 'Gabarito do segundo simulado integrador de SOI II para correção e acompanhamento do desempenho.',
+            type: 'Gabarito',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/GABARITO%20SEGUNDO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+          {
+            title: 'TERCEIRO SIMULADO INTEGRADORA SOI II',
+            description: 'Terceiro simulado integrador de SOI II para revisão ampla dos módulos antes da prova.',
+            type: 'Simulado',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/TERCEIRO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+          {
+            title: 'GABARITO TERCEIRO SIMULADO INTEGRADORA SOI II',
+            description: 'Gabarito do terceiro simulado integrador de SOI II para fechar a revisão com correção orientada.',
+            type: 'Gabarito',
+            href: 'TN%20medicina/simulados/INTEGRADORA%20SOI%20II/GABARITO%20TERCEIRO%20SIMULADO%20INTEGRADORA%20SOI%20II.pdf',
+          },
+        ],
         soi: [
           {
             title: 'PRIMEIRO SIMULADO SOI II',
